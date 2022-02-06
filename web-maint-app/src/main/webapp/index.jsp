@@ -47,6 +47,8 @@
     <br><br>
     <a href="ticket">Create ticket</a>
     <br><br>
+    <a href="tickets">List tickets</a>
+    <br><br>
 </h2>
 </body>
 </html>
