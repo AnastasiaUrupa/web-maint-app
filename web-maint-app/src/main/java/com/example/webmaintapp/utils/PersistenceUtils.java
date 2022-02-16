@@ -7,7 +7,7 @@ public class PersistenceUtils {
 
     private static EntityManagerFactory entityManagerFactory;
 
-    public static EntityManagerFactory getEntityManagerFactory() {
+    public static synchronized EntityManagerFactory getEntityManagerFactory() {
         if (entityManagerFactory == null) {
             entityManagerFactory = Persistence.createEntityManagerFactory("MaintAppPU");
         }

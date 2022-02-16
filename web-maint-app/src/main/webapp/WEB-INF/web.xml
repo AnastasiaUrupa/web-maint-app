@@ -5,6 +5,6 @@
     version="4.0">
 
     <error-page>
-        <location>/error.jsp</location>
+        <location>/WEB-INF/error.jsp</location>
     </error-page>
 </web-app>

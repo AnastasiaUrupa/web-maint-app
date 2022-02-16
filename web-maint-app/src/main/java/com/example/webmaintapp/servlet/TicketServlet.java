@@ -1,11 +1,8 @@
 package com.example.webmaintapp.servlet;
 
-import com.example.webmaintapp.dao.ComponentDao;
-import com.example.webmaintapp.dao.CustomerDao;
-import com.example.webmaintapp.dao.TicketDao;
-import com.example.webmaintapp.entity.Priority;
-import com.example.webmaintapp.entity.Status;
-import com.example.webmaintapp.entity.Ticket;
+import com.example.webmaintapp.business.ComponentService;
+import com.example.webmaintapp.business.CustomerService;
+import com.example.webmaintapp.business.TicketService;
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -17,16 +14,16 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "TicketServlet", value = "/ticket")
 public class TicketServlet extends HttpServlet {
 
-    private final CustomerDao customerDao = new CustomerDao();
-    private final ComponentDao componentDao = new ComponentDao();
-    private final TicketDao ticketDao = new TicketDao();
+    private final CustomerService customerService = new CustomerService();
+    private final ComponentService componentService = new ComponentService();
+    private final TicketService ticketService = new TicketService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
-        request.setAttribute("customerList", customerDao.getCustomerList());
-        request.setAttribute("componentList", componentDao.getComponentList());
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("ticket.jsp");
+        request.setAttribute("customerList", customerService.getCustomerList());
+        request.setAttribute("componentList", componentService.getComponentList());
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("WEB-INF/ticket.jsp");
         requestDispatcher.forward(request, response);
     }
 
@@ -38,14 +35,7 @@ public class TicketServlet extends HttpServlet {
         Long customerId = Long.parseLong(request.getParameter("customer"));
         Long componentId = Long.parseLong(request.getParameter("component"));
         String priority = request.getParameter("priority");
-        Ticket ticket = new Ticket();
-        ticket.setTitle(title);
-        ticket.setDescription(description);
-        ticket.setCustomer(customerDao.findCustomerById(customerId));
-        ticket.setComponent(componentDao.findComponentById(componentId));
-        ticket.setPriority(Priority.valueOf(priority));
-        ticket.setStatus(Status.OPEN);
-        ticketDao.saveTicket(ticket);
+        ticketService.saveTicket(title, description, customerId, componentId, priority);
         response.sendRedirect(request.getContextPath() + "/index.jsp");
     }
 }

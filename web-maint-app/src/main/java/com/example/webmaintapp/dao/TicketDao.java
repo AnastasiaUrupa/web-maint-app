@@ -1,7 +1,5 @@
 package com.example.webmaintapp.dao;
 
-import static com.example.webmaintapp.utils.PersistenceUtils.getEntityManagerFactory;
-
 import com.example.webmaintapp.entity.Component;
 import com.example.webmaintapp.entity.Component_;
 import com.example.webmaintapp.entity.Customer;
@@ -12,40 +10,31 @@ import com.example.webmaintapp.entity.Ticket_;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class TicketDao {
+public class TicketDao implements Dao<Ticket> {
 
-    private final EntityManager entityManager = getEntityManagerFactory().createEntityManager();
-    private static final Logger logger = LoggerFactory.getLogger(TicketDao.class);
-
-    public void saveTicket(Ticket ticket) {
-        EntityTransaction transaction = null;
-        try {
-            transaction = entityManager.getTransaction();
-            transaction.begin();
-            entityManager.persist(ticket);
-            transaction.commit();
-        } catch (Exception e) {
-            logger.error("Unable to save ticket: " + e.getMessage());
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            throw e;
-        }
-
+    @Override
+    public void save(EntityManager entityManager,Ticket ticket) {
+        entityManager.persist(ticket);
     }
 
-    public List<Ticket> findTicketsByCriteria(Priority priority, String customerName, String componentName) {
-        entityManager.getTransaction().begin();
+    @Override
+    public Ticket findById(EntityManager entityManager, Long id) {
+        return entityManager.find(Ticket.class, id);
+    }
+
+    @Override
+    public List<Ticket> getList(EntityManager entityManager) {
+        return entityManager.createQuery("from Ticket", Ticket.class).getResultList();
+    }
+
+    public List<Ticket> findTicketsByCriteria(EntityManager entityManager, Priority priority, String customerName, String componentName) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Ticket> query = criteriaBuilder.createQuery(Ticket.class);
         Root<Ticket> root = query.from(Ticket.class);
@@ -62,10 +51,6 @@ public class TicketDao {
             predicates.add(criteriaBuilder.equal(componentJoin.get(Component_.name), componentName));
         }
         query.where(criteriaBuilder.and(predicates.toArray(new Predicate[0])));
-        List<Ticket> ticketList = entityManager.createQuery(query).getResultList();
-        entityManager.getTransaction().commit();
-        return ticketList;
+        return entityManager.createQuery(query).getResultList();
     }
-
-
 }
