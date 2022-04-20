@@ -18,9 +18,8 @@ import org.slf4j.LoggerFactory;
 public class TicketService {
 
     private static final Logger logger = LoggerFactory.getLogger(TicketService.class);
-
-    private final TicketDao ticketDao = new TicketDao();
     private final EntityManager entityManager = getEntityManagerFactory().createEntityManager();
+    private final TicketDao ticketDao = new TicketDao(entityManager);
 
     public void saveTicket(String title, String description, Long customerId, Long componentId, String priority) {
         Ticket ticket = new Ticket();
@@ -34,7 +33,7 @@ public class TicketService {
         try {
             transaction = entityManager.getTransaction();
             transaction.begin();
-            ticketDao.save(entityManager, ticket);
+            ticketDao.save(ticket);
             transaction.commit();
         } catch (Exception e) {
             logger.error("Unable to save ticket: " + e.getMessage());
@@ -48,7 +47,7 @@ public class TicketService {
     public List<Ticket> findTicketsByCriteria(String priority, String customerName, String componentName) {
         Priority priorityValue = EnumUtils.getEnumIgnoreCase(Priority.class, priority);
         entityManager.getTransaction().begin();
-        List<Ticket> ticketList = ticketDao.findTicketsByCriteria(entityManager, priorityValue, customerName, componentName);
+        List<Ticket> ticketList = ticketDao.findTicketsByCriteria(priorityValue, customerName, componentName);
         entityManager.getTransaction().commit();
         return ticketList;
     }

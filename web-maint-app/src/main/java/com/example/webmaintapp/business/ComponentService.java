@@ -15,9 +15,8 @@ import org.slf4j.LoggerFactory;
 public class ComponentService {
 
     private static final Logger logger = LoggerFactory.getLogger(ComponentService.class);
-
-    private final ComponentDao componentDao = new ComponentDao();
     private final EntityManager entityManager = getEntityManagerFactory().createEntityManager();
+    private final ComponentDao componentDao = new ComponentDao(entityManager);
 
     public void saveComponent(String name, String team, String versionNumber) {
         Component component = new Component(name, team);
@@ -28,7 +27,7 @@ public class ComponentService {
         try {
             transaction = entityManager.getTransaction();
             transaction.begin();
-            componentDao.save(entityManager, component);
+            componentDao.save(component);
             transaction.commit();
         } catch (Exception e) {
             logger.error("Unable to save component: " + e.getMessage());
@@ -41,14 +40,14 @@ public class ComponentService {
 
     public Component getComponentById(Long id) {
         entityManager.getTransaction().begin();
-        Component component = componentDao.findById(entityManager, id);
+        Component component = componentDao.findById(id);
         entityManager.getTransaction().commit();
         return component;
     }
 
     public List<Component> getComponentList() {
         entityManager.getTransaction().begin();
-        List<Component> componentList = componentDao.getList(entityManager);
+        List<Component> componentList = componentDao.getList();
         entityManager.getTransaction().commit();
         return componentList;
     }
@@ -58,9 +57,9 @@ public class ComponentService {
         try {
             transaction = entityManager.getTransaction();
             transaction.begin();
-            Component component = componentDao.findById(entityManager, componentId);
+            Component component = componentDao.findById(componentId);
             component.addVersion(new Version(version, component));
-            componentDao.save(entityManager, component);
+            componentDao.save(component);
             transaction.commit();
         } catch (Exception e) {
             logger.error("Unable to save component: " + e.getMessage());

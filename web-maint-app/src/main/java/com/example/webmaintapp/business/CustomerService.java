@@ -13,9 +13,8 @@ import org.slf4j.LoggerFactory;
 public class CustomerService {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomerService.class);
-
-    private final CustomerDao customerDao = new CustomerDao();
     private final EntityManager entityManager = getEntityManagerFactory().createEntityManager();
+    private final CustomerDao customerDao = new CustomerDao(entityManager);
 
     public void saveCustomer(String name, String person) {
         Customer customer = new Customer(name, person);
@@ -23,7 +22,7 @@ public class CustomerService {
         try {
             transaction = entityManager.getTransaction();
             transaction.begin();
-            customerDao.save(entityManager, customer);
+            customerDao.save(customer);
             transaction.commit();
         } catch (Exception e) {
             logger.error("Unable to save customer: " + e.getMessage());
@@ -36,14 +35,14 @@ public class CustomerService {
 
     public Customer findCustomerById(Long id) {
         entityManager.getTransaction().begin();
-        Customer customer = customerDao.findById(entityManager,id);
+        Customer customer = customerDao.findById(id);
         entityManager.getTransaction().commit();
         return customer;
     }
 
     public List<Customer> getCustomerList() {
         entityManager.getTransaction().begin();
-        List<Customer> customerList = customerDao.getList(entityManager);
+        List<Customer> customerList = customerDao.getList();
         entityManager.getTransaction().commit();
         return customerList;
     }

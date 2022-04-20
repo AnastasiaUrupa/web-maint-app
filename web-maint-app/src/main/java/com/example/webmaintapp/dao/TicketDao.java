@@ -17,24 +17,14 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import org.apache.commons.lang3.StringUtils;
 
-public class TicketDao implements Dao<Ticket> {
+public class TicketDao extends AbstractDao<Ticket> {
 
-    @Override
-    public void save(EntityManager entityManager,Ticket ticket) {
-        entityManager.persist(ticket);
+    public TicketDao(EntityManager entityManager) {
+        super(entityManager, Ticket.class);
     }
 
-    @Override
-    public Ticket findById(EntityManager entityManager, Long id) {
-        return entityManager.find(Ticket.class, id);
-    }
-
-    @Override
-    public List<Ticket> getList(EntityManager entityManager) {
-        return entityManager.createQuery("from Ticket", Ticket.class).getResultList();
-    }
-
-    public List<Ticket> findTicketsByCriteria(EntityManager entityManager, Priority priority, String customerName, String componentName) {
+    public List<Ticket> findTicketsByCriteria(Priority priority, String customerName,
+        String componentName) {
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Ticket> query = criteriaBuilder.createQuery(Ticket.class);
         Root<Ticket> root = query.from(Ticket.class);

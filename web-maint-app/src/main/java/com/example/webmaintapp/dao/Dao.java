@@ -1,14 +1,13 @@
 package com.example.webmaintapp.dao;
 
 import java.util.List;
-import javax.persistence.EntityManager;
 
 public interface Dao<T> {
 
-    T findById(EntityManager entityManager, Long id);
+    T findById(Long id);
 
-    List<T> getList(EntityManager entityManager);
+    List<T> getList();
 
-    void save(EntityManager entityManager, T entity);
+    void save(T entity);
 
 }
